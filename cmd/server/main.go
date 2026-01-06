@@ -13,7 +13,9 @@ func main() {
 		log.Fatal("ERROR:",err)
 	}
 	defer db.Close()
-	
+
 	r := gin.Default()
 	r.Run(":8080")
 }
+
+//00:08:00
