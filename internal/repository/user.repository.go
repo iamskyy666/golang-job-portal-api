@@ -39,3 +39,24 @@ func GetUserById(db *sql.DB, id int)(*models.User,error){
 	}
 	return &user,nil
 }
+
+func GetUserByUserName(db *sql.DB, username string)(*models.User, error){
+	user:=&models.User{}
+
+	err:=db.QueryRow(`SELECT * FROM users WHERE username = ?`,username).Scan(
+    &user.ID,
+    &user.Username,
+    &user.Password,
+    &user.Email,
+    &user.CreatedAt,
+    &user.UpdatedAt,
+    &user.IsAdmin,
+    &user.ProfilePicture,
+)
+
+if err != nil {
+		log.Println("⚠️ ERROR:",err.Error())
+		return nil, err
+	}
+return user,nil
+}

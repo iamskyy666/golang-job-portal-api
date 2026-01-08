@@ -11,7 +11,23 @@ import (
 
 func LoginHandler(db *sql.DB)gin.HandlerFunc{
 	return  func(ctx *gin.Context) {
-		//var user models.User
+		var user models.User
+		if err:=ctx.ShouldBindJSON(&user);err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{
+				"error":err.Error(),
+				"status_code":http.StatusBadRequest,
+			})
+			return 
+		}
+		token,err := services.LoginUser(db,user.Username, user.Password)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{
+				"error":"⚠️ Invalid Credentials!",
+				"status_code":http.StatusInternalServerError,
+			})
+			return 
+		}
+		ctx.JSON(http.StatusOK, gin.H{"token":token})
 	}
 }
 
