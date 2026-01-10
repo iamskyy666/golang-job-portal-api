@@ -1,0 +1,11 @@
+POST http://localhost:8080/jobs
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNreXkxIiwidXNlcklEIjoxLCJpc19hZG1pbiI6ZmFsc2UsImV4cCI6MTc2ODA5MDg0MX0.FmVS7o7qwTU3RG7W3qaax-Wro9zxsE6ijRy-cjwpW0U
+
+{
+    "title":"Golang Developer",
+    "description":"Make REST APIs for backend services using Golang",
+    "location":"Berlin",
+    "company":"Zalando",
+    "salary":"40000"
+}
