@@ -21,4 +21,7 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 	authenticated.POST("/users/:id",handlers.UpdateProfilePictureHandler(db))
 
 	//older way: r.PUT("/users/:id",auth.AuthMiddleware(),handlers.UpdateUserProfileHandler(db))
+
+	// JOB routes
+	authenticated.POST("/jobs",handlers.CreateJobHandler(db))
 }
