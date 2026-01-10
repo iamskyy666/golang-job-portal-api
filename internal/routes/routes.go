@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
+	"github.com/iamskyy666/golang-job-portal-api/internal/auth"
 	"github.com/iamskyy666/golang-job-portal-api/internal/handlers"
 )
 
@@ -13,5 +14,10 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 	r.POST("/register",handlers.RegisterHandler(db))
 
 	// USER routes
-	r.GET("/users/:id",handlers.GetUserHandler(db))
+	authenticated:=r.Group("/")
+	authenticated.Use(auth.AuthMiddleware())
+	authenticated.GET("/users/:id",handlers.GetUserHandler(db))
+	authenticated.PUT("/users/:id",handlers.UpdateUserProfileHandler(db))
+
+	//older way: r.PUT("/users/:id",auth.AuthMiddleware(),handlers.UpdateUserProfileHandler(db))
 }
