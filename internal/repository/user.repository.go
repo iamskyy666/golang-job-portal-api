@@ -70,3 +70,12 @@ func UpdateUser(db *sql.DB, user *models.User)(*models.User, error){
 
 	return user, nil
 }
+
+func UpdateProfilePic(db *sql.DB, id int, profilePicture string)error{
+	_,err:=db.Exec("UPDATE users SET profile_picture = ?, WHERE id = ?",profilePicture, id)
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return err
+	}
+	return nil
+}
