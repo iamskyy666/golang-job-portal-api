@@ -60,3 +60,13 @@ if err != nil {
 	}
 return user,nil
 }
+
+func UpdateUser(db *sql.DB, user *models.User)(*models.User, error){
+	_,err:=db.Exec("UPDATE users SET username = ?, email = ? WHERE id = ?",user.Username,user.Email, user.ID)
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return nil, err
+	}
+
+	return user, nil
+}

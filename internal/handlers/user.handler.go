@@ -44,18 +44,34 @@ func UpdateUserProfileHandler(db *sql.DB)gin.HandlerFunc{
 			return 
 		}
 
-		var updatedUser struct{
+		var userUpdate struct{
 			Username string `json:"username"`
 			Email string `json:"email"`
 		}
 
-		if err:=ctx.ShouldBindJSON(&updatedUser);err!=nil{
+		if err:=ctx.ShouldBindJSON(&userUpdate);err!=nil{
 			ctx.JSON(http.StatusBadRequest,gin.H{
 				"error":err.Error(),
 				"status_code":http.StatusBadRequest,
 			})
 			return 
 		}
-		
+
+		userID:=ctx.GetInt("userID")
+		isAdmin:= ctx.GetBool("isAdmin")
+
+		if !isAdmin && userID!=id{
+			ctx.JSON(http.StatusUnauthorized,gin.H{"error":"⚠️ Unautorized!"})
+			return 
+		}
+
+		updatedUser,err:=services.UpdateUserProfile(db,id, userUpdate.Username,userUpdate.Email)
+
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":"⚠️Error updating user-profile"})
+			return 
+		}
+
+		ctx.JSON(http.StatusOK,updatedUser)
 	}
 }

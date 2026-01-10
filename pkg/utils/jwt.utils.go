@@ -34,7 +34,7 @@ func ValidateToken(tokenStr string)(*Claims,error){
 	claims:=&Claims{}
 	
 	token,err:=jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-		return os.Getenv("JWT_SECRET"),nil
+		return []byte(os.Getenv("JWT_SECRET")),nil
 	})
 
 	if err != nil || !token.Valid {
