@@ -82,7 +82,7 @@ func GetAllJobsRepo(db *sql.DB) ([]models.Job, error) {
 	return jobs, nil
 }
 
-func GetJobsByUserRepo(db *sql.DB, userID int) ([]models.Job, error) {
+func GetJobsByUserIdRepo(db *sql.DB, userID int) ([]models.Job, error) {
 	rows, err := db.Query(`
 		SELECT 
 			id,
@@ -126,6 +126,43 @@ func GetJobsByUserRepo(db *sql.DB, userID int) ([]models.Job, error) {
 
 	return jobs, nil
 }
+
+func GetJobByIdRepo(db *sql.DB, id int) (*models.Job, error) {
+	job := &models.Job{}
+
+	row := db.QueryRow(`
+		SELECT 
+			id,
+			title,
+			description,
+			location,
+			company,
+			salary,
+			created_at,
+			user_id
+		FROM jobs
+		WHERE id = ?
+	`, id)
+
+	if err := row.Scan(
+		&job.ID,
+		&job.Title,
+		&job.Description,
+		&job.Location,
+		&job.Company,
+		&job.Salary,
+		&job.CreatedAt,
+		&job.UserId,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, err
+		}
+		return nil, err
+	}
+
+	return job, nil
+}
+
 
 
 

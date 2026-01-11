@@ -15,6 +15,10 @@ func GetAllJobsService(db *sql.DB)([]models.Job,error){
 	return repository.GetAllJobsRepo(db)
 }
 
-func GetJobsByUserService(db *sql.DB, userID int)([]models.Job,error){
-	return repository.GetJobsByUserRepo(db, userID)
+func GetJobsByUserIdService(db *sql.DB, userID int)([]models.Job,error){
+	return repository.GetJobsByUserIdRepo(db, userID)
+}
+
+func GetJobByIdService(db *sql.DB, id int)(*models.Job,error){
+	return repository.GetJobByIdRepo(db, id)
 }
