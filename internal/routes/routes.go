@@ -24,4 +24,5 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 
 	// JOB routes
 	authenticated.POST("/jobs",handlers.CreateJobHandler(db))
+	authenticated.GET("/jobs",handlers.GetAllJobsHandler(db))
 }

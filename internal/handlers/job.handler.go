@@ -30,3 +30,14 @@ func CreateJobHandler(db *sql.DB) gin.HandlerFunc{
 		ctx.JSON(http.StatusCreated, createdJob)
 	}
 }
+
+func GetAllJobsHandler(db *sql.DB) gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		jobs, err:=services.GetAllJobsService(db)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+			return 
+		}
+		ctx.JSON(http.StatusOK,jobs)
+	}
+}
