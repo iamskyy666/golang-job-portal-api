@@ -82,6 +82,52 @@ func GetAllJobsRepo(db *sql.DB) ([]models.Job, error) {
 	return jobs, nil
 }
 
+func GetJobsByUserRepo(db *sql.DB, userID int) ([]models.Job, error) {
+	rows, err := db.Query(`
+		SELECT 
+			id,
+			title,
+			description,
+			location,
+			company,
+			salary,
+			created_at,
+			user_id
+		FROM jobs
+		WHERE user_id = ?
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var jobs []models.Job
+
+	for rows.Next() {
+		var job models.Job
+		if err := rows.Scan(
+			&job.ID,
+			&job.Title,
+			&job.Description,
+			&job.Location,
+			&job.Company,
+			&job.Salary,
+			&job.CreatedAt,
+			&job.UserId,
+		); err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, job)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return jobs, nil
+}
+
+
 
 	//! The job Model {} for refernce..
 	// type Job struct {
