@@ -10,6 +10,7 @@ import (
 	"github.com/iamskyy666/golang-job-portal-api/internal/services"
 )
 
+
 func CreateJobHandler(db *sql.DB) gin.HandlerFunc{
 	return func(ctx *gin.Context) {
 		var job models.Job
@@ -32,6 +33,7 @@ func CreateJobHandler(db *sql.DB) gin.HandlerFunc{
 	}
 }
 
+
 func GetAllJobsHandler(db *sql.DB) gin.HandlerFunc{
 	return func(ctx *gin.Context) {
 		jobs, err:=services.GetAllJobsService(db)
@@ -43,6 +45,7 @@ func GetAllJobsHandler(db *sql.DB) gin.HandlerFunc{
 	}
 }
 
+
 func GetJobsByUserIdHandler(db *sql.DB)gin.HandlerFunc{
 	return  func(ctx *gin.Context) {
 		jobs,err:=services.GetJobsByUserIdService(db,ctx.GetInt("userID"))
@@ -53,6 +56,7 @@ func GetJobsByUserIdHandler(db *sql.DB)gin.HandlerFunc{
 		ctx.JSON(http.StatusOK,jobs)
 	}
 }
+
 
 func GetJobByIdHandler(db *sql.DB)gin.HandlerFunc{
 	return  func(ctx *gin.Context) {
@@ -69,6 +73,7 @@ func GetJobByIdHandler(db *sql.DB)gin.HandlerFunc{
 		ctx.JSON(http.StatusOK,job)
 	}
 }
+
 
 func UpdateJobHandler(db *sql.DB)gin.HandlerFunc{
 	return  func(ctx *gin.Context) {
@@ -98,4 +103,26 @@ func UpdateJobHandler(db *sql.DB)gin.HandlerFunc{
 
 	}
 	
+}
+
+
+func DeleteJobHandler(db *sql.DB)gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		id,err:=strconv.Atoi(ctx.Param("id"))
+		if err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{"error":"⚠️ Invalid job-ID!"})
+			return 
+		}
+
+		userID:=ctx.GetInt("userID")
+		isAdmin:=ctx.GetBool("isAdmin")
+
+		err = services.DeleteJobService(db,id,userID,isAdmin)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+			return 
+		}
+
+		ctx.JSON(http.StatusOK,gin.H{"message":"Job deleted successfully! ✅"})
+	}
 }

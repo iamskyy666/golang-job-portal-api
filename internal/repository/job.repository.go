@@ -199,6 +199,15 @@ func UpdateJobRepo(db *sql.DB, job *models.Job) (*models.Job, error) {
 }
 
 
+func DeleteJobRepo(db *sql.DB, id int)error{
+	_, err := db.Exec(`DELETE FROM jobs WHERE id = ?`,id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 
 
 	//! The job Model {} for refernce..
