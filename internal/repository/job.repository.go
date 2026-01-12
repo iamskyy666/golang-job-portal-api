@@ -163,6 +163,41 @@ func GetJobByIdRepo(db *sql.DB, id int) (*models.Job, error) {
 	return job, nil
 }
 
+// func UpdateJobRepo(db *sql.DB, job *models.Job)(*models.Job, error){
+// 	_,err:=db.Exec("UPDATE jobs SET title = ?, description = ?, company= ?, location = ?, salary = ? WHERE id = ?",job.Title, job.Description, job.Company, job.Location, job.Salary, job.ID)
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return job,nil
+// }
+
+func UpdateJobRepo(db *sql.DB, job *models.Job) (*models.Job, error) {
+	_, err := db.Exec(`
+		UPDATE jobs 
+		SET 
+			title = ?, 
+			description = ?, 
+			company = ?,
+			location = ?, 
+			salary = ?
+		WHERE id = ?
+	`,
+		job.Title,
+		job.Description,
+		job.Company,
+		job.Location,
+		job.Salary,
+		job.ID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// 👇 THIS is where it belongs
+	return GetJobByIdRepo(db, job.ID)
+}
+
 
 
 

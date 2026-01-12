@@ -67,5 +67,35 @@ func GetJobByIdHandler(db *sql.DB)gin.HandlerFunc{
 			return 
 		}
 		ctx.JSON(http.StatusOK,job)
+	}
 }
+
+func UpdateJobHandler(db *sql.DB)gin.HandlerFunc{
+	return  func(ctx *gin.Context) {
+		id,err:=strconv.Atoi(ctx.Param("id"))
+		if err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{"error":"⚠️ Invalid job-ID!"})
+			return 
+		}
+
+		var job models.Job
+		job.ID=id
+
+		if err:=ctx.ShouldBindJSON(&job);err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+			return 
+		}
+
+		userID:=ctx.GetInt("userID")
+		isAdmin:=ctx.GetBool("isAdmin")
+
+		updatedJob,err:=services.UpdateJobService(db,&job,userID,isAdmin)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+			return 
+		}
+			ctx.JSON(http.StatusOK,updatedJob)
+
+	}
+	
 }
