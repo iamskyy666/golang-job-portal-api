@@ -19,3 +19,7 @@ func UpdateUserProfile(db *sql.DB, id int, username, emailId string)(*models.Use
 func UpdateProfilePicture(db *sql.DB,id int, profilePicture string)error{
 	return repository.UpdateProfilePic(db,id,profilePicture)
 }
+
+func GetUsersService(db *sql.DB)([]*models.User,error){
+	return repository.GetUsersRepo(db)
+}

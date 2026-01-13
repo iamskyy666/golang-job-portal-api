@@ -125,3 +125,19 @@ func UpdateProfilePictureHandler(db *sql.DB)gin.HandlerFunc{
 
 	}
 }
+
+func GetUsersHandler(db *sql.DB)gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		isAdmin:=ctx.GetBool("isAdmin")
+		if(isAdmin==false){
+			ctx.JSON(http.StatusUnauthorized,gin.H{"error":"⚠️ Unauthorized to fetch all users!"})
+			return 
+		}
+		users, err:=services.GetUsersService(db)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+			return 
+		}
+		ctx.JSON(http.StatusOK,users)
+	}
+}

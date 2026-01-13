@@ -79,3 +79,43 @@ func UpdateProfilePic(db *sql.DB, id int, profilePicture string)error{
 	}
 	return nil
 }
+
+func GetUsersRepo(db *sql.DB)([]*models.User,error){
+rows, err := db.Query("SELECT * FROM users")
+
+	var users []*models.User
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.User
+		var profilePicture sql.NullString
+		if err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.Password,
+			&user.Email,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.IsAdmin,
+			&profilePicture,
+		); err != nil {
+			return nil, err
+		}
+
+		if profilePicture.Valid{
+			user.ProfilePicture = &profilePicture.String
+		}else{
+			user.ProfilePicture = nil
+		}
+		users = append(users, &user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
