@@ -128,6 +128,7 @@ func UpdateProfilePictureHandler(db *sql.DB)gin.HandlerFunc{
 
 func GetUsersHandler(db *sql.DB)gin.HandlerFunc{
 	return func(ctx *gin.Context) {
+		// check whether user is admin or not
 		isAdmin:=ctx.GetBool("isAdmin")
 		if(isAdmin==false){
 			ctx.JSON(http.StatusUnauthorized,gin.H{"error":"⚠️ Unauthorized to fetch all users!"})
@@ -139,5 +140,46 @@ func GetUsersHandler(db *sql.DB)gin.HandlerFunc{
 			return 
 		}
 		ctx.JSON(http.StatusOK,users)
+	}
+}
+
+
+func DeleteUserHandler(db *sql.DB)gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		// check whether user is admin or not
+		isAdmin:=ctx.GetBool("isAdmin")
+		if(isAdmin==false){
+			ctx.JSON(http.StatusUnauthorized,gin.H{"error":"⚠️ Unauthorized to fetch all users!"})
+			return 
+		}
+
+		id,err:=strconv.Atoi(ctx.Param("id"))
+		if err!=nil{
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error":"Invalid user-ID!",
+				"status_code":http.StatusBadRequest,
+			})
+			return 
+		}
+
+		// check if current user is trynna delete himself/herself
+		cuuUserID:=ctx.GetInt("userID")
+		if cuuUserID==id{
+			ctx.JSON(http.StatusBadRequest,gin.H{"ERROR":"⚠️ You cannot delete yourself!"})
+			return 
+		}
+
+		// Delete User
+		err = services.DeleteUserService(ctx, db,id)
+
+		if err!=nil{
+		if err.Error() == "user not found"{
+			ctx.JSON(http.StatusNotFound,gin.H{"ERROR":"⚠️ User not found!"})
+			return 
+		}
+		ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return 
+	 }
+	 ctx.JSON(http.StatusOK,gin.H{"message":"User and associated data deleted successfully! ☑️"})
 	}
 }

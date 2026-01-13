@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/iamskyy666/golang-job-portal-api/internal/models"
@@ -128,4 +129,40 @@ func UpdateUserPasswordRepo(db *sql.DB,user *models.User)error{
 		return err
 	}
 	return nil
+}
+
+func DeleteUserWithTransactionRepo(tx *sql.Tx, userID int)(string,error){
+	// Delete associated jobs first
+	_,err:=tx.Exec("DELETE FROM jobs WHERE user_id = ?",userID)
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return "",fmt.Errorf("ERROR deleting user's jobs: %v",err)
+	}
+
+	// Get user's profile before deleting
+	var profilePicture sql.NullString
+	err=tx.QueryRow("SELECT profile_picture FROM users WHERE id = ?",userID).Scan(&profilePicture)
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return "",fmt.Errorf("ERROR fetching user's profile_picture: %v",err)
+	}
+
+	// Delete the user
+	result,err:=tx.Exec("DELETE FROM users WHERE id = ?",userID)
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return "",fmt.Errorf("ERROR deleting User: %v",err)
+	}
+
+	rowsAffected,err:=result.RowsAffected()
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return "",fmt.Errorf("ERROR getting rows-affected: %v",err)
+	}
+
+	if rowsAffected==0{
+		return "",sql.ErrNoRows
+	}
+
+	return profilePicture.String,nil
 }

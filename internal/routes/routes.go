@@ -33,6 +33,5 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 
 	// ADMIN routes
 	authenticated.GET("/users",handlers.GetUsersHandler(db))
-
-
+	authenticated.DELETE("/users/:id",handlers.DeleteUserHandler(db))
 }
