@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/iamskyy666/golang-job-portal-api/internal/models"
+	"github.com/iamskyy666/golang-job-portal-api/pkg/utils"
 )
 
 func PasswordValidationMiddleWare() gin.HandlerFunc{
@@ -24,7 +25,7 @@ func PasswordValidationMiddleWare() gin.HandlerFunc{
 
 		// Parse the request
 		var req models.ChangePasswordRequest
-		if err:=ctx.ShouldBindPlain(&req);err!=nil{
+		if err:=ctx.ShouldBindJSON(&req);err!=nil{
 			ctx.JSON(400, gin.H{"error":"⚠️ Invalid request-body!"})
 			ctx.Abort()
 			return 
@@ -32,6 +33,13 @@ func PasswordValidationMiddleWare() gin.HandlerFunc{
 
 		// Restore the req. body for the next mw/handler
 		ctx.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+		isValid,errors:=utils.ValidatePasswordStrength(req.NewPassword)
+
+		if !isValid{
+			ctx.JSON(400, gin.H{"error":"⚠️ Password-validation failed!","error_details":errors})
+			ctx.Abort()
+			return 
+		}
 		ctx.Next()
 	}
 }

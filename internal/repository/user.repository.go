@@ -172,7 +172,7 @@ func DeleteUserWithTransactionRepo(tx *sql.Tx, userID int)(string,error){
 func ChangePasswordRepo(db *sql.DB, userID int,currentPassword string, newPassword string)error{
 	// First fetch and validate curr. password
 	var hashedPassword string
-	err:=db.QueryRow("SELECT password FROM users WEHERE id = ?",userID).Scan(&hashedPassword)
+	err:=db.QueryRow("SELECT password FROM users WHERE id = ?",userID).Scan(&hashedPassword)
 	if err!=nil{
 		if err==sql.ErrNoRows{
 			return fmt.Errorf("user_id not found : %v",err)
