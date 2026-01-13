@@ -72,7 +72,7 @@ func UpdateUser(db *sql.DB, user *models.User)(*models.User, error){
 }
 
 func UpdateProfilePic(db *sql.DB, id int, profilePicture string)error{
-	_,err:=db.Exec("UPDATE users SET profile_picture = ?, WHERE id = ?",profilePicture, id)
+	_,err:=db.Exec("UPDATE users SET profile_picture = ? WHERE id = ?",profilePicture, id)
 	if err != nil {
 		log.Println("ERROR:",err.Error())
 		return err
@@ -118,4 +118,14 @@ rows, err := db.Query("SELECT * FROM users")
 	}
 
 	return users, nil
+}
+
+
+func UpdateUserPasswordRepo(db *sql.DB,user *models.User)error{
+	_,err:=db.Exec("UPDATE users SET password = ? WHERE id = ?",user.Password, user.ID)
+	if err != nil {
+		log.Println("ERROR:",err)
+		return err
+	}
+	return nil
 }

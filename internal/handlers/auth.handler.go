@@ -57,3 +57,27 @@ func RegisterHandler(db *sql.DB)gin.HandlerFunc{
 		
 	}
 }
+
+
+func ForgotPasswordHandler(db *sql.DB) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var req models.ForgotPassword
+
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		newPassword, err := services.ForgotPasswordService(db, req.Username)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "User not found"})
+			return
+		}
+
+		// Fake email ignored — returning password for testing
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Password reset successful",
+			"password": newPassword,
+		})
+	}
+}

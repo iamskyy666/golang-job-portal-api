@@ -36,4 +36,29 @@ func LoginUser(db *sql.DB, username, password string)(string, error){
 }
 
 
+func ForgotPasswordService(db *sql.DB, username string) (string, error) {
+	user, err := repository.GetUserByUserName(db, username)
+	if err != nil {
+		return "", err
+	}
+
+	// 1. Generate plain password
+	newPassword := utils.GenerateRandomPassword(6)
+
+	// 2. Hash it
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	// 3. Save hashed password
+	user.Password = string(hashedPassword)
+	if err := repository.UpdateUserPasswordRepo(db, user); err != nil {
+		return "", err
+	}
+
+	// 4. RETURN PLAIN PASSWORD (IMPORTANT)
+	return newPassword, nil
+}
+
 

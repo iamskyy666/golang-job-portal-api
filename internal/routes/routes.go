@@ -13,6 +13,7 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 	r.POST("/login",handlers.LoginHandler(db))
 	r.POST("/register",handlers.RegisterHandler(db))
 	r.GET("/jobs",handlers.GetAllJobsHandler(db))
+	r.POST("/forgot-password",handlers.ForgotPasswordHandler(db))
 
 	// USER routes
 	authenticated:=r.Group("/")
@@ -32,6 +33,6 @@ func InitRoutes(r *gin.Engine, db *sql.DB){
 
 	// ADMIN routes
 	authenticated.GET("/users",handlers.GetUsersHandler(db))
-	//authenticated.DELETE("/users/:id",handlers.ForgotPasswordHandler(db))
+
 
 }
