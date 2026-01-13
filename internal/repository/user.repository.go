@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/iamskyy666/golang-job-portal-api/internal/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func CreateUser(db *sql.DB, user *models.User)error{
@@ -165,4 +166,44 @@ func DeleteUserWithTransactionRepo(tx *sql.Tx, userID int)(string,error){
 	}
 
 	return profilePicture.String,nil
+}
+
+
+func ChangePasswordRepo(db *sql.DB, userID int,currentPassword string, newPassword string)error{
+	// First fetch and validate curr. password
+	var hashedPassword string
+	err:=db.QueryRow("SELECT password FROM users WEHERE id = ?",userID).Scan(&hashedPassword)
+	if err!=nil{
+		if err==sql.ErrNoRows{
+			return fmt.Errorf("user_id not found : %v",err)
+		}
+		return fmt.Errorf("ERROR changing the password : %v",err)
+	}
+
+	// Verify whether curr. password is correct or not
+	if err:=bcrypt.CompareHashAndPassword([]byte(hashedPassword),[]byte(currentPassword));err!=nil{
+		return fmt.Errorf("ERROR! Current pasword is incorrect.")
+	}
+
+	// Only if new password is correct, proceed to update
+	hashedNewPassword,err:=bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err!=nil{
+		return fmt.Errorf("ERROR hashing new password: %v",err)
+	}
+
+	result, err:= db.Exec("UPDATE users SET password = ? WHERE id = ?",hashedNewPassword,userID)
+	if err!=nil{
+		return fmt.Errorf("ERROR updating password: %v",err)
+	}
+
+	rowsAffected,err:=result.RowsAffected()
+	if err != nil {
+		log.Println("ERROR:",err.Error())
+		return fmt.Errorf("ERROR checking update result: %v",err)
+	}
+
+	if rowsAffected==0{
+		return fmt.Errorf("No User found with id: %d",userID)
+	}
+	return nil
 }

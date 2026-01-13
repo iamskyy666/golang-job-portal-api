@@ -64,3 +64,8 @@ func DeleteUserService(ctx *gin.Context, db *sql.DB, userID int)error{
 	return nil
 
 }
+
+func ChangePasswordService(db *sql.DB, userID int,currentPassword string, newPassword string)error{
+	return repository.ChangePasswordRepo(db,userID,currentPassword,newPassword)
+
+}

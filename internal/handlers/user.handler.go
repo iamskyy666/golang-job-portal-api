@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/iamskyy666/golang-job-portal-api/internal/models"
 	"github.com/iamskyy666/golang-job-portal-api/internal/services"
 )
 
@@ -181,5 +182,28 @@ func DeleteUserHandler(db *sql.DB)gin.HandlerFunc{
 		return 
 	 }
 	 ctx.JSON(http.StatusOK,gin.H{"message":"User and associated data deleted successfully! ☑️"})
+	}
+}
+
+
+func ChangePasswordHandler(db *sql.DB)gin.HandlerFunc{
+	return func(ctx *gin.Context) {
+		var req models.ChangePasswordRequest
+		if err:=ctx.ShouldBindJSON(&req);err!=nil{
+			ctx.JSON(http.StatusBadRequest,gin.H{
+				"error":err.Error(),
+				"status_code":http.StatusBadRequest,
+			})
+			return 
+		}
+
+		userID:=ctx.GetInt("userID")
+		err:=services.ChangePasswordService(db,userID,req.CurrentPassword,req.NewPassword)
+		if err!=nil{
+			ctx.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+			return 
+		}
+		ctx.JSON(http.StatusOK,gin.H{"message":"Password changed successfully! ✅"})
+
 	}
 }
